@@ -14,6 +14,7 @@ namespace Military_Asset_Management_System.Data
         public DbSet<Transfer> Transfers { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

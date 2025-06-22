@@ -17,10 +17,12 @@ namespace Military_Asset_Management_System.Controllers
     public class PurchasesController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly AuditLogService _auditLogService;
 
-        public PurchasesController(AppDbContext context)
+        public PurchasesController(AppDbContext context, AuditLogService auditLogService)
         {
             _context = context;
+            _auditLogService = auditLogService;
         }
 
         // GET: api/Purchases
@@ -82,7 +84,7 @@ namespace Military_Asset_Management_System.Controllers
         {
             _context.Purchases.Add(purchase);
             await _context.SaveChangesAsync();
-
+            await _auditLogService.LogAsync("PurchaseCreated", "Purchase", purchase.PurchaseId, User.Identity.Name, $"Created purchase for BaseId={purchase.BaseId}, EquipmentTypeId={purchase.EquipmentTypeId}, Quantity={purchase.Quantity}");
             return CreatedAtAction("GetPurchase", new { id = purchase.PurchaseId }, purchase);
         }
 

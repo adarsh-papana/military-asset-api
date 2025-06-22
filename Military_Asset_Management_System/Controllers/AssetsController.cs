@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Military_Asset_Management_System.Data;
 using Military_Asset_Management_System.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Military_Asset_Management_System.Controllers
 {
@@ -22,9 +23,19 @@ namespace Military_Asset_Management_System.Controllers
         }
 
         // GET: api/Assets
+        [Authorize(Roles = "Admin,BaseCommander,LogisticsOfficer")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Asset>>> GetAssets()
+        public async Task<ActionResult<IEnumerable<Asset>>> GetAssets([FromQuery] int? baseId = null)
         {
+            var user = HttpContext.User;
+            if (user.IsInRole("BaseCommander"))
+            {
+                // Assume BaseId is stored as a claim
+                var userBaseId = int.Parse(user.Claims.First(c => c.Type == "BaseId").Value);
+                return await _context.Assets.Where(a => a.BaseId == userBaseId).ToListAsync();
+            }
+            if (baseId.HasValue)
+                return await _context.Assets.Where(a => a.BaseId == baseId).ToListAsync();
             return await _context.Assets.ToListAsync();
         }
 
