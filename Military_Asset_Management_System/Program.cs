@@ -82,10 +82,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173", "https://localhost:5173", "http://localhost:7287")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials();
+            policy
+                .SetIsOriginAllowed(origin =>
+                    origin.StartsWith("http://localhost") || origin.StartsWith("https://localhost"))
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
         });
 });
 
