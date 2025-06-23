@@ -11,7 +11,8 @@ using System.Threading.Tasks;
 
 namespace Military_Asset_Management_System.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
+    [AllowAnonymous] // For testing purposes, allow anonymous access
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
