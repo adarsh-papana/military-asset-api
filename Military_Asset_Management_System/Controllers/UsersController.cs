@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 namespace Military_Asset_Management_System.Controllers
 {
     //[Authorize(Roles = "Admin")]
+    [EnableCors("AllowFrontend")]
     [AllowAnonymous] // For testing purposes, allow anonymous access
     [Route("api/[controller]")]
     [ApiController]
