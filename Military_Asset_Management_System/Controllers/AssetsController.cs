@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Military_Asset_Management_System.Controllers
 {
+    [Authorize(Roles = "Admin,BaseCommander,LogisticsOfficer")]
     [Route("api/[controller]")]
     [ApiController]
     public class AssetsController : ControllerBase
@@ -23,7 +24,7 @@ namespace Military_Asset_Management_System.Controllers
         }
 
         // GET: api/Assets
-        [Authorize(Roles = "Admin,BaseCommander,LogisticsOfficer")]
+        
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Asset>>> GetAssets([FromQuery] int? baseId = null)
         {

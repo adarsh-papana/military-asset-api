@@ -10,6 +10,7 @@ using System.Text;
 
 namespace Military_Asset_Management_System.Controllers
 {
+    [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
@@ -21,7 +22,7 @@ namespace Military_Asset_Management_System.Controllers
             _context = context;
         }
 
-        [AllowAnonymous]
+        
         [HttpPost("login")]
         public IActionResult Login(LoginRequest request)
         {
