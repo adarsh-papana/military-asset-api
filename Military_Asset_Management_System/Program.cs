@@ -98,16 +98,22 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(); // ✅ Enable even in production for Railway debug
+    app.UseDeveloperExceptionPage(); // ✅ TEMPORARY: Shows real error
+}
 
 app.UseRouting();
 
 // ✅ CORS MUST come BEFORE Auth
 app.UseCors("AllowFrontend");
 
-app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseHttpsRedirection();
 
 app.MapControllers();
 
