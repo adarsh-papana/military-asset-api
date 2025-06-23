@@ -77,18 +77,29 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy(name: MyAllowSpecificOrigins,
+//        policy =>
+//        {
+//            policy
+//                .SetIsOriginAllowed(origin =>
+//                    origin.StartsWith("http://localhost") || origin.StartsWith("https://localhost"))
+//                .AllowAnyHeader()
+//                .AllowAnyMethod()
+//                .AllowCredentials();
+//        });
+//});
+
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-        policy =>
-        {
-            policy
-                .SetIsOriginAllowed(origin =>
-                    origin.StartsWith("http://localhost") || origin.StartsWith("https://localhost"))
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowCredentials();
-        });
+    options.AddPolicy("AllowFrontend",
+        policy => policy
+            .WithOrigins("http://localhost:5173") // your React dev server
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+    );
 });
 
 
@@ -108,7 +119,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseRouting();
 
-app.UseCors(MyAllowSpecificOrigins);
+app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
 
