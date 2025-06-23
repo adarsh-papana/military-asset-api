@@ -5,20 +5,18 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
 var builder = WebApplication.CreateBuilder(args);
 
-var key = Encoding.ASCII.GetBytes(builder.Configuration["JWT_SECRET"] ?? "SuperSecretKeyWith32Characters!!"); // Use better key in production
+// 🔐 JWT Key
+var key = Encoding.ASCII.GetBytes(builder.Configuration["JWT_SECRET"] ?? "SuperSecretKeyWith32Characters!!");
 
-// Add services to the container.
+// 🧱 Register Services
 builder.Services.AddScoped<AuditLogService>();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-//var key = Encoding.ASCII.GetBytes("SuperSecretKeyWith32Characters!!"); // Use better key in production
-
+// 🔐 JWT Authentication Setup
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -39,9 +37,9 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+
+// 🔄 Swagger with JWT Auth
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
@@ -50,7 +48,6 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1"
     });
 
-    // 🔐 JWT Auth Setup for Swagger
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -58,7 +55,7 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description = "Enter 'Bearer' [space] and then your valid token.\n\nExample: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6..."
+        Description = "Enter 'Bearer' followed by your JWT token.\n\nExample: Bearer eyJhbGciOiJIUzI1NiIs..."
     });
 
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
@@ -72,45 +69,30 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "Bearer"
                 }
             },
-            new string[] {}
+            Array.Empty<string>()
         }
     });
 });
 
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy(name: MyAllowSpecificOrigins,
-//        policy =>
-//        {
-//            policy
-//                .SetIsOriginAllowed(origin =>
-//                    origin.StartsWith("http://localhost") || origin.StartsWith("https://localhost"))
-//                .AllowAnyHeader()
-//                .AllowAnyMethod()
-//                .AllowCredentials();
-//        });
-//});
-
+// ✅ CORS Policy
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend",
-        policy => policy
-            .WithOrigins("http://localhost:5173") // your React dev server
+    options.AddPolicy("AllowFrontend", builder =>
+    {
+        builder
+            .WithOrigins("http://localhost:5173") // Your frontend dev origin
             .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials()
-    );
+            .AllowAnyMethod();
+    });
 });
-
-
 
 var app = builder.Build();
 
-// Set the port from environment variable or default to 5000
+// ✅ Port Setup for Railway
 var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
 app.Urls.Add($"http://*:{port}");
 
-// Configure the HTTP request pipeline.
+// 🛠️ Middleware Pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -119,12 +101,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseRouting();
 
+// ✅ CORS MUST come BEFORE Auth
 app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllers();
